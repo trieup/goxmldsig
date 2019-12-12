@@ -80,7 +80,7 @@ func TestSign(t *testing.T) {
 	require.Equal(t, base64.StdEncoding.EncodeToString(digest), digestValueElement.Text())
 }
 
-func TestSignErrors(t *testing.T) {
+func TestSignNoIDAttribute(t *testing.T) {
 	randomKeyStore := RandomKeyStoreForTest()
 	ctx := &SigningContext{
 		Hash:        crypto.SHA512_256,
@@ -105,8 +105,13 @@ func TestSignErrors(t *testing.T) {
 		Tag:   "AuthnRequest",
 	}
 
-	_, err = ctx.SignEnveloped(authnRequest)
-	require.Error(t, err)
+	signed, err := ctx.SignEnveloped(authnRequest)
+	require.NoError(t, err)
+
+	ref := signed.FindElement("./Signature/SignedInfo/Reference")
+	require.NotNil(t, ref)
+	refURI := ref.SelectAttrValue("URI", "")
+	require.Equal(t, refURI, "")
 }
 
 func TestSignNonDefaultID(t *testing.T) {

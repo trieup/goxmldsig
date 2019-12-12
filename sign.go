@@ -90,14 +90,13 @@ func (ctx *SigningContext) constructSignedInfo(el *etree.Element, enveloped bool
 	// /SignedInfo/Reference
 	reference := ctx.createNamespacedElement(signedInfo, ReferenceTag)
 
-	// dataId := el.SelectAttrValue(ctx.IdAttribute, "")
-	// if dataId == "" {
-	// 	return nil, errors.New("Missing data ID")
-	// }
+	dataId := el.SelectAttrValue(ctx.IdAttribute, "")
 
-	// reference.CreateAttr(URIAttr, "#"+dataId)
-
-	reference.CreateAttr(URIAttr, "")
+	if dataId == "" {
+		reference.CreateAttr(URIAttr, "")
+	} else {
+		reference.CreateAttr(URIAttr, "#"+dataId)
+	}
 
 	// /SignedInfo/Reference/Transforms
 	transforms := ctx.createNamespacedElement(reference, TransformsTag)
